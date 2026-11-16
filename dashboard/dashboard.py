@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -148,6 +147,46 @@ untuk memahami pendapatan produk, penggunaan metode pembayaran,
 karakteristik transaksi, dan segmentasi pelanggan.
 """)
 
+# FILTER TANGGAL GLOBAL
+min_date = orders_clean["order_purchase_timestamp"].min().date()
+max_date = orders_clean["order_purchase_timestamp"].max().date()
+
+st.sidebar.header("Filter Dashboard")
+st.sidebar.caption("Pilih rentang tanggal transaksi yang ingin dianalisis.")
+
+start_date = st.sidebar.date_input(
+    "Start Date",
+    value=min_date,
+    min_value=min_date,
+    max_value=max_date,
+    key="start_date"
+)
+
+end_date = st.sidebar.date_input(
+    "End Date",
+    value=max_date,
+    min_value=min_date,
+    max_value=max_date,
+    key="end_date"
+)
+
+if start_date > end_date:
+    st.sidebar.error("Start Date tidak boleh melebihi End Date.")
+    st.stop()
+
+start_timestamp = pd.Timestamp(start_date)
+end_timestamp_exclusive = pd.Timestamp(end_date) + pd.Timedelta(days=1)
+
+date_filtered_orders = orders_clean[
+    orders_clean["order_purchase_timestamp"].ge(start_timestamp)
+    & orders_clean["order_purchase_timestamp"].lt(end_timestamp_exclusive)
+].copy()
+
+st.sidebar.caption(
+    f"Rentang dataset: {min_date:%d %b %Y} – {max_date:%d %b %Y}"
+)
+st.sidebar.caption(f"Pesanan dalam rentang terpilih: {len(date_filtered_orders):,}")
+
 st.divider()
 
 
@@ -219,10 +258,10 @@ dibandingkan periode Januari-Agustus 2017?
 
 
 # Menyeleksi pesanan delivered Januari-Agustus 2017 dan 2018
-orders_bq1 = orders_clean[
-    (orders_clean["order_status"] == "delivered") &
-    (orders_clean["order_purchase_timestamp"].dt.year.isin([2017, 2018])) &
-    (orders_clean["order_purchase_timestamp"].dt.month <= 8)
+orders_bq1 = date_filtered_orders[
+    (date_filtered_orders["order_status"] == "delivered") &
+    (date_filtered_orders["order_purchase_timestamp"].dt.year.isin([2017, 2018])) &
+    (date_filtered_orders["order_purchase_timestamp"].dt.month <= 8)
 ].copy()
 
 
@@ -265,20 +304,14 @@ revenue_by_year = (
     .reset_index()
 )
 
-revenue_2017 = revenue_by_year.loc[
-    revenue_by_year["year"] == 2017,
-    "total_revenue"
-].iloc[0]
-
-revenue_2018 = revenue_by_year.loc[
-    revenue_by_year["year"] == 2018,
-    "total_revenue"
-].iloc[0]
+revenue_lookup = revenue_by_year.set_index("year")["total_revenue"].to_dict()
+revenue_2017 = revenue_lookup.get(2017, 0)
+revenue_2018 = revenue_lookup.get(2018, 0)
 
 growth = (
-    (revenue_2018 - revenue_2017) /
-    revenue_2017
-) * 100
+    ((revenue_2018 - revenue_2017) / revenue_2017) * 100
+    if revenue_2017 != 0 else np.nan
+)
 
 
 # Menampilkan metrik pendapatan
@@ -297,9 +330,14 @@ with col2:
     )
 
 with col3:
+    growth_display = (
+        f"{growth:.2f}%"
+        if pd.notna(growth)
+        else "Tidak tersedia"
+    )
     st.metric(
         "Pertumbuhan Pendapatan",
-        f"{growth:.2f}%"
+        growth_display
     )
 
 # PENDAPATAN BERDASARKAN KATEGORI
@@ -316,7 +354,7 @@ category_comparison = category_revenue.pivot(
     index="product_category_name_english",
     columns="year",
     values="price"
-).fillna(0)
+).reindex(columns=[2017, 2018], fill_value=0).fillna(0)
 
 category_comparison = category_comparison.rename(
     columns={
@@ -326,8 +364,8 @@ category_comparison = category_comparison.rename(
 )
 
 category_comparison["contribution_2018 (%)"] = (
-    category_comparison["revenue_2018"] /
-    revenue_2018 * 100
+    category_comparison["revenue_2018"] / revenue_2018 * 100
+    if revenue_2018 != 0 else 0
 )
 
 category_comparison["growth (%)"] = (
@@ -504,10 +542,7 @@ st.write(
 )
 
 # Memilih seluruh pesanan pada periode Januari 2017 - Agustus 2018
-orders_bq2 = orders_clean[
-    (orders_clean["order_purchase_timestamp"] >= "2017-01-01") &
-    (orders_clean["order_purchase_timestamp"] < "2018-09-01")
-].copy()
+orders_bq2 = date_filtered_orders.copy()
 
 # Menggabungkan data pesanan dengan data pembayaran
 payments_bq2 = orders_bq2.merge(
