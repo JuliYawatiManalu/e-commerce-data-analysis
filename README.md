@@ -121,5 +121,5 @@ Dashboard akan terbuka melalui browser menggunakan alamat lokal yang diberikan o
 
 Dashboard dikembangkan menggunakan Streamlit dan menyediakan visualisasi interaktif untuk membantu pengguna memahami hasil analisis data e-commerce.
 
-**Link Dashboard:** Akan ditambahkan setelah proses deployment selesai.
+**Link Dashboard:** (https://e-commerce-data-analysis-abvyueid9u7kaywa5z86jd.streamlit.app/)
 
