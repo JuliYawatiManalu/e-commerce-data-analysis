@@ -2,25 +2,21 @@
 
 ## Deskripsi Proyek
 
-Proyek ini merupakan analisis data e-commerce menggunakan **Brazilian E-Commerce Public Dataset by Olist**. Proyek ini bertujuan untuk memahami performa penjualan, pola penggunaan metode pembayaran, serta karakteristik pelanggan berdasarkan data transaksi e-commerce.
+Proyek ini merupakan analisis data e-commerce menggunakan dataset Brazilian E-Commerce Public Dataset by Olist. Proyek bertujuan untuk memahami performa penjualan, pola penggunaan metode pembayaran, serta karakteristik pelanggan berdasarkan data transaksi e-commerce.
 
-Hasil analisis disajikan dalam bentuk dashboard interaktif menggunakan **Streamlit** agar informasi dapat dipahami dengan lebih mudah melalui visualisasi data.
-
-Dashboard dilengkapi dengan fitur filter tanggal interaktif yang memungkinkan pengguna memilih rentang waktu transaksi sesuai kebutuhan analisis.
+Hasil analisis disajikan dalam bentuk dashboard interaktif menggunakan Streamlit agar informasi dapat dipahami dengan lebih mudah melalui visualisasi data.
 
 ## Tujuan Analisis
 
 Proyek ini berfokus pada dua pertanyaan bisnis utama:
 
 ### Business Question 1
-
-**Kategori produk mana yang menyumbang pendapatan terbesar pada Januari–Agustus 2018, dan bagaimana pertumbuhannya dibandingkan Januari–Agustus 2017?**
+Kategori produk mana yang menyumbang pendapatan terbesar pada Januari-Agustus 2018, dan bagaimana pertumbuhannya dibandingkan Januari-Agustus 2017?
 
 Analisis dilakukan dengan melihat pendapatan produk berdasarkan kategori, membandingkan pendapatan pada kedua periode, serta mengamati tren pendapatan setiap bulan.
 
 ### Business Question 2
-
-**Bagaimana komposisi dan tren penggunaan metode pembayaran pelanggan setiap bulan, serta bagaimana perbedaan rata-rata nilai pembayaran dan jumlah cicilan berdasarkan metode pembayaran selama Januari 2017 hingga Agustus 2018?**
+Bagaimana komposisi dan tren penggunaan metode pembayaran pelanggan setiap bulan, serta bagaimana perbedaan rata-rata nilai pembayaran dan jumlah cicilan berdasarkan metode pembayaran selama Januari 2017 hingga Agustus 2018?
 
 Analisis dilakukan untuk memahami distribusi metode pembayaran, perubahan penggunaannya setiap bulan, rata-rata nilai pembayaran, dan jumlah cicilan berdasarkan metode pembayaran.
 
@@ -29,39 +25,12 @@ Analisis dilakukan untuk memahami distribusi metode pembayaran, perubahan penggu
 Selain menjawab pertanyaan bisnis utama, proyek ini juga melakukan analisis lanjutan menggunakan beberapa teknik:
 
 - **Binning:** Mengelompokkan pesanan berdasarkan rentang total nilai pembayaran.
-- **Manual Grouping:** Mengelompokkan metode pembayaran dan jumlah cicilan untuk melihat pola transaksi berdasarkan kelompok nilai pembayaran.
+- **Manual Grouping:** Mengelompokkan metode pembayaran dan jumlah cicilan untuk melihat pola transaksi berdasarkan kelompok nilai pesanan.
 - **RFM Analysis:** Mengelompokkan pelanggan berdasarkan Recency, Frequency, dan Monetary untuk memahami aktivitas dan nilai transaksi pelanggan.
-
-## Fitur Dashboard
-
-Dashboard dikembangkan menggunakan Streamlit dan menyediakan beberapa fitur untuk membantu pengguna memahami hasil analisis data e-commerce.
-
-### 1. Filter Tanggal Interaktif
-
-Pengguna dapat menentukan rentang tanggal transaksi melalui dua pilihan:
-
-- **Start Date:** Menentukan tanggal awal analisis.
-- **End Date:** Menentukan tanggal akhir analisis.
-
-Rentang tanggal dapat dipilih sesuai periode yang tersedia dalam dataset, yaitu 4 September 2016 hingga 17 Oktober 2018.
-
-Dashboard juga menampilkan jumlah pesanan dalam rentang tanggal yang dipilih. Filter tanggal digunakan untuk menyesuaikan hasil analisis pada visualisasi Business Question 1 dan Business Question 2.
-
-### 2. Analisis Pendapatan Produk
-
-Menyajikan informasi pendapatan berdasarkan kategori produk, perbandingan pendapatan tahun 2017 dan 2018, serta tren pendapatan bulanan.
-
-### 3. Analisis Metode Pembayaran
-
-Menyajikan komposisi dan tren penggunaan metode pembayaran setiap bulan, rata-rata nilai pembayaran, serta jumlah cicilan berdasarkan metode pembayaran.
-
-### 4. Analisis Lanjutan
-
-Menyajikan hasil Binning, Manual Grouping, dan RFM Analysis untuk memperoleh pemahaman lebih lanjut mengenai pola transaksi dan karakteristik pelanggan.
 
 ## Dataset
 
-Dataset yang digunakan berasal dari **Brazilian E-Commerce Public Dataset by Olist**.
+Dataset yang digunakan berasal dari Brazilian E-Commerce Public Dataset by Olist.
 
 Enam file dataset yang digunakan dalam dashboard:
 
@@ -72,7 +41,7 @@ Enam file dataset yang digunakan dalam dashboard:
 5. `order_payments_dataset.csv`
 6. `customers_dataset.csv`
 
-Dataset disimpan dalam folder `data/` dan digunakan sebagai sumber data dashboard.
+Dataset sumber disimpan dalam folder `data/` dan digunakan sebagai input notebook serta dashboard. Notebook tidak menimpa dataset sumber. Hasil proses cleaning disimpan secara terpisah di folder `cleaned_data/` yang dibuat otomatis ketika notebook dijalankan.
 
 ## Teknologi yang Digunakan
 
@@ -100,7 +69,6 @@ E-Commerce Analysis/
 │   ├── order_payments_dataset.csv
 │   └── customers_dataset.csv
 │
-├── notebook.ipynb
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
@@ -111,37 +79,37 @@ E-Commerce Analysis/
 
 Pastikan Python sudah terpasang pada perangkat.
 
-**1. Clone repository**
+1. Clone repository:
 
 ```bash
 git clone <URL-REPOSITORY>
 ```
 
-**2. Masuk ke folder proyek**
+2. Masuk ke folder proyek:
 
 ```bash
 cd "E-Commerce Analysis"
 ```
 
-**3. Buat dan aktifkan virtual environment (opsional)**
+3. Buat dan aktifkan virtual environment (opsional):
 
 ```bash
 python -m venv .venv
 ```
 
-Aktifkan virtual environment pada Windows:
+Windows:
 
 ```bash
 .venv\Scripts\activate
 ```
 
-**4. Install library yang dibutuhkan**
+4. Install library yang dibutuhkan:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-**5. Jalankan dashboard**
+5. Jalankan dashboard:
 
 ```bash
 streamlit run dashboard/dashboard.py
@@ -153,5 +121,4 @@ Dashboard akan terbuka melalui browser menggunakan alamat lokal yang diberikan o
 
 Dashboard dikembangkan menggunakan Streamlit dan menyediakan visualisasi interaktif untuk membantu pengguna memahami hasil analisis data e-commerce.
 
-**Link Dashboard:**
-[https://e-commerce-data-analysis-abvyueid9u7kaywa5z86jd.streamlit.app/]
+**Link Dashboard:** (https://e-commerce-data-analysis-abvyueid9u7kaywa5z86jd.streamlit.app/)

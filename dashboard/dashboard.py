@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -73,7 +74,6 @@ order_items_clean = order_items_df.copy()
 products_clean = products_df.copy()
 category_clean = category_df.copy()
 payments_clean = payments_df.copy()
-
 customers_clean = customers_df.copy()
 
 # Mengubah kolom tanggal menjadi datetime
@@ -96,45 +96,25 @@ order_items_clean["shipping_limit_date"] = pd.to_datetime(
     errors="coerce"
 )
 
-# Mengisi kategori produk yang kosong
+# Pastikan proses terjemahan kategori menghasilkan satu kolom yang konsisten,
+# baik jika file produk sumber sudah memiliki kolom bahasa Inggris maupun belum.
 products_clean["product_category_name"] = (
     products_clean["product_category_name"].fillna("Unknown")
 )
-
-# Menggabungkan produk dengan terjemahan kategori
-products_clean = products_clean.merge(
+products_clean = products_clean.drop(
+    columns=["product_category_name_english"],
+    errors="ignore"
+).merge(
     category_clean,
     on="product_category_name",
     how="left"
 )
-
-
-# DATA CLEANING SESUAI NOTEBOOK
-orders_clean = orders_df.copy()
-order_items_clean = order_items_df.copy()
-products_clean = products_df.copy()
-category_clean = category_df.copy()
-payments_clean = payments_df.copy()
-customers_clean = customers_df.copy()
-
-# Mengubah kolom tanggal menjadi datetime
-order_date_columns = [
-    "order_purchase_timestamp",
-    "order_approved_at",
-    "order_delivered_carrier_date",
-    "order_delivered_customer_date",
-    "order_estimated_delivery_date"
-]
-
-for column in order_date_columns:
-    orders_clean[column] = pd.to_datetime(
-        orders_clean[column],
-        errors="coerce"
+products_clean["product_category_name_english"] = (
+    products_clean["product_category_name_english"].fillna(
+        products_clean["product_category_name"]
+        .str.replace("_", " ", regex=False)
+        .str.title()
     )
-
-order_items_clean["shipping_limit_date"] = pd.to_datetime(
-    order_items_clean["shipping_limit_date"],
-    errors="coerce"
 )
 
 
@@ -154,9 +134,13 @@ max_date = orders_clean["order_purchase_timestamp"].max().date()
 st.sidebar.header("Filter Dashboard")
 st.sidebar.caption("Pilih rentang tanggal transaksi yang ingin dianalisis.")
 
+# Default filter mengikuti periode utama analisis pada notebook (BQ2).
+default_start_date = max(min_date, pd.Timestamp("2017-01-01").date())
+default_end_date = min(max_date, pd.Timestamp("2018-08-31").date())
+
 start_date = st.sidebar.date_input(
     "Start Date",
-    value=min_date,
+    value=default_start_date,
     min_value=min_date,
     max_value=max_date,
     key="start_date"
@@ -164,7 +148,7 @@ start_date = st.sidebar.date_input(
 
 end_date = st.sidebar.date_input(
     "End Date",
-    value=max_date,
+    value=default_end_date,
     min_value=min_date,
     max_value=max_date,
     key="end_date"
@@ -186,6 +170,7 @@ st.sidebar.caption(
     f"Rentang dataset: {min_date:%d %b %Y} – {max_date:%d %b %Y}"
 )
 st.sidebar.caption(f"Pesanan dalam rentang terpilih: {len(date_filtered_orders):,}")
+st.sidebar.caption("Periode default mengikuti analisis utama: 1 Jan 2017 – 31 Agu 2018.")
 
 st.divider()
 
@@ -537,11 +522,13 @@ st.markdown("**Business Question 2**")
 st.write(
     "Bagaimana komposisi dan tren penggunaan metode pembayaran pelanggan "
     "setiap bulan, serta bagaimana perbedaan rata-rata nilai pembayaran "
-    "dan jumlah cicilan berdasarkan metode pembayaran selama "
-    "Januari 2017 hingga Agustus 2018?"
+    "dan jumlah cicilan berdasarkan metode pembayaran pada periode "
+    f"{start_date:%d %b %Y} hingga {end_date:%d %b %Y}?"
 )
 
-# Memilih seluruh pesanan pada periode Januari 2017 - Agustus 2018
+# Menggunakan rentang tanggal yang dipilih pengguna.
+# Pada kondisi awal, filter disetel ke 1 Januari 2017 - 31 Agustus 2018
+# agar konsisten dengan periode Business Question 2 pada notebook.
 orders_bq2 = date_filtered_orders.copy()
 
 # Menggabungkan data pesanan dengan data pembayaran
